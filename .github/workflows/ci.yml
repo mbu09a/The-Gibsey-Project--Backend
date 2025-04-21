@@ -4,6 +4,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'  # nightly at UTC midnight
 permissions:
   contents: read
   packages: write
@@ -59,3 +61,33 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           flyctl deploy --remote-only --image ghcr.io/${{ github.repository }}/fastapi:${{ github.sha }}
+  nightly-seed:
+    name: Nightly Corpus Seed
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.ref == 'refs/heads/main'
+    needs: test
+    services:
+      cassandra:
+        image: cassandra:4.1
+        options: >-
+          --health-cmd "cqlsh -e 'describe keyspaces'"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r backend/app/requirements.txt
+      - name: Run seed script
+        run: make seed
+      - name: Cache HNSW index and embeddings
+        uses: actions/cache@v3
+        with:
+          path: |
+            data/hnsw.idx
+            data/vectors.npy
+            data/corpus.manifest.json
+          key: seed-index-${{ runner.os }}-${{ hashFiles('data/corpus.manifest.json') }}

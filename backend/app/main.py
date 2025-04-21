@@ -327,7 +327,9 @@ async def search_pages(
     request: Request,
     q: str = Query(..., min_length=1, max_length=512),
     k: int = Query(5, ge=1),
-    engine: str = Query("native")
+    engine: str = Query("native"),
+    ef: int = Query(64, ge=1),      # HNSW search parameter
+    M: int = Query(8, ge=1)         # HNSW construction parameter (placeholder)
 ):
     """Return k most similar pages. engine=native|python"""
     # start timer for Prometheus metrics
@@ -342,6 +344,11 @@ async def search_pages(
     if engine == "native":
         import numpy as np
         import ann_hnsw
+        # adjust HNSW search ef parameter at runtime
+        try:
+            ann_hnsw.idx.set_ef(ef)
+        except Exception:
+            pass
         q_np = np.asarray(q_vec, dtype=np.float32)
         try:
             hits = ann_hnsw.query(q_np, k)

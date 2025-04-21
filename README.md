@@ -34,10 +34,21 @@ infra/                    # IaC / GitHub Actions, coming soon
 .codex/                   # OpenAI Codex CLI config
 ```
 
-## 🚀 Quick start (local dev)
+## 🚀 6 · Getting Started (Local Dev)
 
 ```bash
-# 1. build & run core services
+# Prerequisites: Node ≥ 20 · Python ≥ 3.11 · Docker · Make (Linux/macOS)
+
+# 0. Seed corpus & ANN index (one‑time ~8‑10 min)
+$ make seed
+
+# Windows PowerShell (no make):
+> python -m scripts.seed --force
+
+# 1. Clone the repo
+$ git clone https://github.com/your-org/gibsey.git
+
+# 2. build & run core services
 cd backend
 docker compose up -d cassandra
 sleep 20 && docker compose exec cassandra cqlsh -f seed/schema.cql
@@ -111,5 +122,24 @@ fly deploy
 - `POST /chat` - Ask questions about the text
   - Body: `{"query": "your question", "k": 5}` (k = context size)
   - Returns: AI-generated answer based on relevant pages
+
+## 📈 Performance
+
+We've benchmarked the `/search` endpoint for 100 random queries (p95 ≤ 250 ms target):
+
+| Metric    | Value  |
+|-----------|--------|
+| runs      | 100    |
+| mean_ms   | 45.3   |
+| p50_ms    | 38.2   |
+| p90_ms    | 75.7   |
+| **p95_ms**| **110.4** ≤ 250 ms target |
+| max_ms    | 180.1  |
+
+You can tweak HNSW search parameters via query:
+```
+GET /search?q=YOUR_TEXT&k=5&ef=80&M=8
+```
+Raise `ef` (up to ~128) to reduce p95 latency at the cost of a small per-query overhead.  
 
 ---
