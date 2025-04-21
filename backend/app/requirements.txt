@@ -11,3 +11,4 @@ prometheus-client==0.20.0
 mypy==1.10.0
 slowapi==0.1.8
 redis==5.0.3
+python-jose[cryptography]

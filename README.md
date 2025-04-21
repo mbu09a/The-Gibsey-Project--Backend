@@ -80,10 +80,18 @@ curl -X POST "http://localhost:8000/chat" \
 
 ## 🛡 Environment variables
 
-Copy `.env.example` → `.env` and fill in:
+Copy `.env.example` → `.env` and fill in all values:
 
-```
+```dotenv
 OPENAI_API_KEY=sk-____________________
+
+# Supabase
+SUPABASE_PROJECT=your-supabase-project-ref
+SUPABASE_JWKS_URL=https://your-supabase-project.supabase.co/auth/v1/keys
+
+# Dev HS256 secret & environment
+DEV_JWT_SECRET=dev-only-secret
+ENV=dev
 ```
 ## 🚀 Deploying to Fly.io
 
