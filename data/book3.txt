@@ -1,0 +1,15 @@
+===
+Welcome to Book 3, another placeholder for testing.
+This will demonstrate multi-book search capabilities.
+===
+Page 2 of Book 3 contains different information.
+This allows us to test cross-book search functionality.
+===
+On page 3, we discuss how Gibsey handles different books.
+The system treats each book as a separate story with a unique ID.
+===
+Page 4 of Book 3 demonstrates how embeddings work.
+Similar concepts across different books can be found via vector search.
+===
+This final page concludes our Book 3 sample.
+We now have two books loaded with embeddings for testing. 

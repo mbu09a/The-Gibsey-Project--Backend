@@ -1,0 +1,15 @@
+===
+This is page 1 of Book 2, a sample placeholder for testing.
+The Gibsey Project is an interactive storytelling platform.
+===
+This is page 2 of Book 2.
+It contains some sample text for embedding generation.
+===
+Page 3 has more information about our sample.
+This will be used to test vector search capabilities.
+===
+Page 4 introduces new concepts and ideas.
+We'll use this to verify that SAI (Storage-Attached Index) works correctly.
+===
+Page 5 concludes our sample book.
+This demonstrates proper pagination and embedding. 

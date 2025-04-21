@@ -1,0 +1,61 @@
+name: CI + CD
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+permissions:
+  contents: read
+  packages: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      cassandra:
+        image: cassandra:4.1
+        options: >-
+          --health-cmd "cqlsh -e 'describe keyspaces'"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:6-alpine
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps & run tests
+        run: |
+          pip install -r backend/app/requirements.txt pytest
+          pytest -q
+  build-push:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/fastapi:${{ github.sha }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-push
+    if: github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[deploy]')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl deploy --remote-only --image ghcr.io/${{ github.repository }}/fastapi:${{ github.sha }}
