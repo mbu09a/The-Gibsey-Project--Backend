@@ -1,0 +1,105 @@
+services:
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: gibsey_cluster
+      CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 10s
+      retries: 20
+
+  cassandra-init:
+    image: cassandra:4.1
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./seed:/seed
+    entrypoint:
+      - sh
+      - -c
+      - cqlsh cassandra -f /seed/schema.cql
+
+  snapshot:
+    image: cassandra:4.1
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+      - ./scripts/snapshot_keyspace.sh:/snapshot.sh:ro
+    entrypoint: ["bash", "-c", "while true; do bash /snapshot.sh gibsey; sleep 86400; done"]
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+  fastapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      cassandra-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+
+  coordinator:
+    image: stargateio/coordinator-4_0:v2
+    environment:
+      CLUSTER_NAME: dev
+      DEVELOPER_MODE: "true"
+    ports: ["8090:8090"]
+
+  restapi:
+    image: stargateio/restapi:v2
+    environment:
+      STARGATE_COORDINATOR_ADDRESS: coordinator
+    depends_on: [ coordinator ]
+    ports: ["8082:8082"]
+
+  embed_load:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      cassandra-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./data:/data
+    env_file:
+      - .env
+    entrypoint:
+      - python
+      - embed_load.py
+      - --input_file
+      - /data/cleaned_normalised.txt
+  monitor:
+    image: python:3.11-slim
+    depends_on:
+      - fastapi
+    environment:
+      - APP_HOST=http://fastapi:8000
+      - SLACK_WEBHOOK=${SLACK_WEBHOOK}
+      - LATENCY_THRESHOLD=1.0
+    volumes:
+      - ./scripts:/scripts:ro
+    command: ["python", "/scripts/latency_monitor.py"]
+
+volumes:
+  cassandra-data:
+  redis-data:

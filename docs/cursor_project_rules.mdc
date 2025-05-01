@@ -1,0 +1,177 @@
+---
+description: Apply these rules when creating the project
+globs:
+alwaysApply: true
+---
+## Project Rules
+
+## Project Overview
+
+*   **Type:** cursor_project_rules
+*   **Description:** I want to build an AI OS that combines AI technology with human authorship into a whole new medium of information and creative exchange. The Gibsey Project is designed to be a recursive AI OS and engine for reading, writing, remembering, and dreaming, targeted at independent readers, writers, educators, artists, coders, and curious minds.
+*   **Primary Goal:** To develop a recursive, AI-driven OS that fuses human creativity with symbolic, real-time narrative interactions, enabling immersive co-authorship and creative exchange — with the goal of replacing one-way predictive interfaces with bi-directional, gift-based symbolic systems for creative exchange.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   **Next.js 14 (App Router):** Enforce the use of the `app/` directory with nested folder structures, following `app/[route]/page.tsx` conventions.
+    *   Example 1: "Next.js 14 (App Router)" → `app/[route]/page.tsx` conventions
+    *   Example 2: "Next.js (Pages Router)" → `pages/[route].tsx` pattern
+    *   Example 3: "React Router 6" → `src/routes/` with `createBrowserRouter`
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   **app/api:** Next.js 14 API routes with Route Handlers
+    *   Example 1: `app/api` → "Next.js 14 API routes using built-in handlers"
+    *   Example 2: `src/views` → "Vue 3 composition API components (for comparable tech setups)"
+
+*   **docs/:** All narrative architecture, symbolic language, system flows, and interaction rules live here. Required for AI agent context and symbolic recursion.
+
+*   **data/ or embeddings/:** Store 1536-dimensional vector embeddings of all 710 pages, as well as HNSW index (`hnsw.idx`) and fallback NumPy arrays.
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   **app/dashboard/layout.tsx:** Next.js 14 root layout implementation using the App Router
+    *   Example 1: `app/dashboard/layout.tsx` → "Next.js 14 root layouts"
+    *   Example 2: `pages/_app.js` → "Next.js Pages Router customization"
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   **next@14:** App Router required; usage of `getInitialProps` is disallowed
+    *   **fastapi@latest:** Endpoints should be asynchronous and support SSE where necessary
+    *   **apache_cassandra@4.1:** Adhere to version-specific data modeling and integration practices
+    *   **supabase_jwt:** Enforce RS256 for JWT verification
+
+## PRD Compliance
+
+*   **Non-Negotiable:**
+
+    *   "The Gibsey Project must merge AI co-authorship with a symbolic narrative interface that operates across immutable and curated content streams." This encapsulates the core constraint of integrating human and AI creativity in a recursive narrative format.
+
+## App Flow Integration
+
+*   **Stack-Aligned Flow:**
+
+    *   Example: "Next.js 14 Auth Flow → `app/auth/login/page.tsx` uses server actions to handle Supabase JWT based authentication."
+
+## Symbolic Interaction Rules
+
+*   Each page, query, or response is tagged with a rotated variant of 16 core Corpus symbols.
+*   Symbol orientation maps to functional roles: UP = Read, RIGHT = Write, DOWN = Dream, LEFT = Remember.
+*   Symbol color reflects narrative source and persists in the Vault for contextual traceability.
+*   New writes overwrite prior unsaved states; Vault saves preserve color, symbol, and source metadata.
+*   No scrolling UX. Gibsey operates on a page-turning ritual model: you co-write a book as you go.
+
+## Best Practices
+
+*   **next_js**
+
+    *   Utilize the App Router for clear separation of routes and components.
+    *   Keep component hierarchy shallow and maintain file modularity.
+    *   Prioritize server actions for critical data fetching and mutations.
+
+*   **typescript**
+
+    *   Enforce strict type-checking throughout the codebase.
+    *   Use interfaces and types to clearly define component props and API responses.
+    *   Regularly update type definitions as the code evolves.
+
+*   **tailwind_css**
+
+    *   Follow a consistent utility-first approach to styling.
+    *   Use configuration files to manage design tokens and breakpoints.
+    *   Leverage JIT mode for optimal build performance.
+
+*   **shadcn_ui**
+
+    *   Ensure UI components are accessible and consistent.
+    *   Customize components minimally to preserve design integrity.
+    *   Utilize pre-built themes as a baseline for styling.
+
+*   **radix_ui**
+
+    *   Use unstyled primitives to build custom, accessible UI components.
+    *   Follow best practices for keyboard and screen reader accessibility.
+    *   Integrate with other UI libraries seamlessly.
+
+*   **lucide_icons**
+
+    *   Use a consistent iconography set across the application.
+    *   Optimize icon usage for both light and dark themes.
+    *   Customize size and color via Tailwind CSS where necessary.
+
+*   **firebase_assistant**
+
+    *   Leverage Firebase for rapid layout generation and scaffolding.
+    *   Maintain clear separation between Firebase integration and core business logic.
+    *   Secure API keys and configuration settings.
+
+*   **fastapi**
+
+    *   Write asynchronous endpoints to ensure high performance.
+    *   Utilize Pydantic for data validation and serialization.
+    *   Structure endpoints logically to separate API concerns.
+
+*   **apache_cassandra**
+
+    *   Follow best practices for schema design and data modeling.
+    *   Use version-specific features for improved performance and reliability.
+    *   Keep configurations consistent across development and production environments.
+
+*   **stargate**
+
+    *   Integrate with Apache Cassandra using RESTful APIs when possible.
+    *   Ensure data consistency across distributed environments.
+    *   Monitor and tune performance for high throughput.
+
+*   **openai_text_embedding_3_small**
+
+    *   Optimize API calls for embedding generation.
+    *   Cache embeddings to reduce redundant work and latency.
+    *   Validate and sanitize input data before processing.
+
+*   **numpy**
+
+    *   Utilize vectorized operations for efficiency.
+    *   Keep dependency versions in sync with other scientific libraries.
+    *   Write tests for computational functions to ensure reliability.
+
+*   **supabase_jwt**
+
+    *   Enforce strict security protocols using RS256 verification.
+    *   Regularly update and audit JWT configurations.
+    *   Handle token expiration and renewal consistently.
+
+## Rules
+
+*   Derive folder/file patterns directly from techStackDoc versions.
+*   If Next.js 14 App Router is in use: Enforce the `app/` directory with nested route folders.
+*   If using Pages Router: Use `pages/*.tsx` with a flat structure.
+*   Mirror this logic for React Router, SvelteKit, etc. Ensure no mixing of pattern versions (e.g., avoid using `pages/` in an App Router project).
+
+## Rules Metrics
+
+Before starting project development, create a metrics file in the root of the project called `cursor_metrics.md`.
+
+### Instructions:
+
+*   Each time a cursor rule is used as context, update `cursor_metrics.md`.
+*   Use the following format for `cursor_metrics.md`:
+
+# Rules Metrics
+
+## Usage
+
+The number of times rules is used as context
+
+*   rule-name.mdc: 5
+*   another-rule.mdc: 2

@@ -1,0 +1,11 @@
+app = "gibsey-backend"
+primary_region = "iad"
+
+[build]
+  image = "ghcr.io/<OWNER>/<REPO>/fastapi:latest"
+
+[env]
+  OPENAI_API_KEY="${OPENAI_API_KEY}"
+  SUPABASE_PROJECT="gibsey-project"
+  CASS_HOST="cassandra"
+  REDIS_HOST="redis"

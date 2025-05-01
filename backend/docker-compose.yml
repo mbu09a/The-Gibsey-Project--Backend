@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  # --------- 1. Cassandra 4.1 with vector module ----------
+  cassandra:
+    image: cassandra:4.1
+    ports: ["9042:9042"]
+    environment:
+      CASSANDRA_CLUSTER_NAME: gibsey_cluster
+      CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "DESCRIBE KEYSPACES;"]
+      interval: 10s
+      retries: 10
+
+  # --------- 2. (Optional) schema bootstrap using cqlsh-only ----------
+  schema-init:
+    image: nuvo/docker-cqlsh:latest          # tiny public image shipping only cqlsh
+    volumes:
+      - ./seed:/seed
+    depends_on: { cassandra: { condition: service_healthy } }
+    entrypoint: ["sh", "-c", "cqlsh cassandra 9042 -f /seed/schema.cql"]
+
+  # --------- 3. Stargate for the C* 4.x backend ----------
+  stargate:
+    image: stargateio/stargate-4_0:v2.1.1     # note the "‑4_0" tag
+    depends_on: { cassandra: { condition: service_healthy } }
+    ports:
+      - "8081:8081"      # REST
+      - "8082:8082"      # GraphQL
+    environment:
+      CLUSTER_NAME: gibsey_cluster
+      CLUSTER_VERSION: "4.0"
+      SEED: cassandra
+      ENABLE_AUTH: "false"
+
+  # --------- 4. FastAPI service ----------
+  api:
+    build: ./fastapi
+    depends_on: [ stargate ]
+    ports: ["8000:8000"]
+    env_file: .env
+
+  # --------- 5. One‑shot embed loader ----------
+  embed-loader:
+    build: ./embed_loader
+    depends_on: [ schema-init, stargate ]
+    volumes:
+      - ./seed:/seed
+    env_file: .env
+    command: ["python", "embed_load.py", "--input_file", "/seed/pages.jsonl"]
+
+volumes:
+  cassandra-data:
